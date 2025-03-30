@@ -47,6 +47,7 @@ const TaskStats: React.FC<TaskStatsProps> = ({ tasks }) => {
       name: STATUS_LABELS[status as keyof typeof STATUS_LABELS] || status,
       value: count,
       status,
+      fill: COLORS[status as keyof typeof COLORS] || '#999999',
     }));
   }, [tasks]);
 
@@ -167,7 +168,8 @@ const TaskStats: React.FC<TaskStatsProps> = ({ tasks }) => {
                 <Bar 
                   dataKey="value" 
                   name="Tasks" 
-                  fill={({ status }) => COLORS[status as keyof typeof COLORS] || '#999999'}
+                  fill="#8884d8"
+                  fillOpacity={0.8}
                 />
               </BarChart>
             </ChartContainer>

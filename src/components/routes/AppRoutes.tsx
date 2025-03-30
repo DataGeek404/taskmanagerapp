@@ -18,19 +18,43 @@ const AppRoutes = () => {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       
       {/* Guest routes (accessible only when not logged in) */}
-      <Route element={<GuestRoute />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Route>
+      <Route path="/login" element={
+        <GuestRoute>
+          <Login />
+        </GuestRoute>
+      } />
+      <Route path="/register" element={
+        <GuestRoute>
+          <Register />
+        </GuestRoute>
+      } />
       
       {/* Protected routes (accessible only when logged in) */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/new-task" element={<NewTask />} />
-        <Route path="/edit-task/:id" element={<EditTask />} />
-        <Route path="/db-setup" element={<DatabaseSetup />} />
-        <Route path="/analytics" element={<TaskAnalytics />} />
-      </Route>
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/new-task" element={
+        <ProtectedRoute>
+          <NewTask />
+        </ProtectedRoute>
+      } />
+      <Route path="/edit-task/:id" element={
+        <ProtectedRoute>
+          <EditTask />
+        </ProtectedRoute>
+      } />
+      <Route path="/db-setup" element={
+        <ProtectedRoute>
+          <DatabaseSetup />
+        </ProtectedRoute>
+      } />
+      <Route path="/analytics" element={
+        <ProtectedRoute>
+          <TaskAnalytics />
+        </ProtectedRoute>
+      } />
       
       {/* Fallback route */}
       <Route path="*" element={<NotFound />} />
