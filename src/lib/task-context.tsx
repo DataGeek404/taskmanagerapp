@@ -4,8 +4,6 @@ import { supabase, Task, TaskStatus } from './supabase';
 import { useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { initializeDatabase, createCustomFunction, setupTasksTable, executeDirectSQL } from './supabase-migrations';
-import { sendTaskReminderEmail } from './email-service';
-import { addHours } from 'date-fns';
 
 interface TaskContextType {
   tasks: Task[];
@@ -13,11 +11,10 @@ interface TaskContextType {
   isLoading: boolean;
   filter: TaskStatus | 'all';
   setFilter: (filter: TaskStatus | 'all') => void;
-  createTask: (title: string, description: string, dueDate?: string | null, notificationsEnabled?: boolean) => Promise<void>;
+  createTask: (title: string, description: string, dueDate?: string | null) => Promise<void>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   refreshTasks: () => Promise<void>;
-  checkDueTasks: () => Promise<void>;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -165,65 +162,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [filter, tasks]);
 
-  // Check for tasks due soon to send email notifications
-  const checkDueTasks = async () => {
-    if (!user) return;
-
-    try {
-      // Find tasks that:
-      // 1. Have notifications enabled
-      // 2. Are not completed
-      // 3. Have a due date
-      // 4. Due within 12 hours
-      const now = new Date();
-      const twelveHoursFromNow = addHours(now, 12);
-      
-      const tasksToNotify = tasks.filter(task => {
-        if (!task.due_date || !task.notifications_enabled || task.status === 'completed') {
-          return false;
-        }
-        
-        const dueDate = new Date(task.due_date);
-        // Check if the task is due in around 12 hours (within a 5-minute window)
-        const hoursDiff = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-        return hoursDiff > 11.9 && hoursDiff < 12.1;
-      });
-      
-      if (tasksToNotify.length > 0) {
-        console.log(`Found ${tasksToNotify.length} tasks due soon`);
-        
-        // Send email notifications
-        for (const task of tasksToNotify) {
-          if (user.email) {
-            await sendTaskReminderEmail(user.email, task.title, task.due_date!);
-            
-            // Update the task to mark that a notification was sent
-            await supabase
-              .from('tasks')
-              .update({ notification_sent: true })
-              .eq('id', task.id)
-              .eq('user_id', user.id);
-          }
-        }
-      }
-    } catch (error: any) {
-      console.error('Error checking due tasks:', error);
-    }
-  };
-
-  // Check for due tasks every 5 minutes
-  useEffect(() => {
-    if (!user) return;
-    
-    // Initial check
-    checkDueTasks();
-    
-    // Set up interval
-    const interval = setInterval(checkDueTasks, 5 * 60 * 1000); // 5 minutes
-    
-    return () => clearInterval(interval);
-  }, [user, tasks]);
-
   const refreshTasks = async () => {
     await fetchTasks();
   };
@@ -231,13 +169,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const createTask = async (
     title: string, 
     description: string, 
-    dueDate: string | null = null, 
-    notificationsEnabled: boolean = false
+    dueDate: string | null = null
   ) => {
     try {
       if (!user) throw new Error('You must be logged in to create tasks');
 
-      console.log("Creating task:", { title, description, dueDate, notificationsEnabled });
+      console.log("Creating task:", { title, description, dueDate });
       
       if (!dbInitialized) {
         await executeDirectSQL();
@@ -249,7 +186,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         status: 'pending' as TaskStatus,
         user_id: user.id,
         due_date: dueDate,
-        notifications_enabled: notificationsEnabled,
       }).select();
 
       if (error) throw error;
@@ -345,7 +281,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateTask,
     deleteTask,
     refreshTasks,
-    checkDueTasks,
   };
 
   return (

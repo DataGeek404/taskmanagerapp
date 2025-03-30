@@ -1,3 +1,4 @@
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,7 +20,6 @@ const taskSchema = z.object({
   description: z.string().min(3, 'Description must be at least 3 characters').max(500),
   status: z.enum(['pending', 'in-progress', 'completed']),
   due_date: z.string().optional(),
-  notifications_enabled: z.boolean().default(false),
 });
 
 type TaskFormValues = z.infer<typeof taskSchema>;
@@ -48,7 +48,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ taskId }) => {
       description: task?.description || '',
       status: task?.status || 'pending',
       due_date: task?.due_date ? task.due_date.split('T')[0] : defaultDueDate(),
-      notifications_enabled: task?.notifications_enabled || false,
     },
   });
 
@@ -59,7 +58,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ taskId }) => {
         description: task.description,
         status: task.status,
         due_date: task.due_date ? task.due_date.split('T')[0] : defaultDueDate(),
-        notifications_enabled: task.notifications_enabled || false,
       });
     }
   }, [task, form]);
@@ -84,8 +82,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ taskId }) => {
         await createTask(
           values.title, 
           values.description, 
-          formattedDueDate, 
-          values.notifications_enabled
+          formattedDueDate
         );
       }
       
@@ -152,27 +149,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ taskId }) => {
                     <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="notifications_enabled"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Email Notifications</FormLabel>
-                    <FormDescription>
-                      Receive an email reminder 12 hours before the task is due
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
                 </FormItem>
               )}
             />

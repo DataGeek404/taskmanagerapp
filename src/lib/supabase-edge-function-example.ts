@@ -1,18 +1,34 @@
 
-// Example of a Supabase Edge Function that can be created in the Supabase dashboard
-// File name: send-reminder-email.ts
+/**
+ * This is an example of a Supabase Edge Function.
+ * 
+ * This file is meant as a reference only and does not run in the browser.
+ * The actual function would need to be created in the Supabase dashboard.
+ */
 
-// deno-lint-ignore-file no-explicit-any
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// This is a mock example showing the structure of a Supabase Edge Function
+// In the actual Supabase dashboard, you would create a file like this:
 
-// You would need to set up email credentials in Supabase dashboard
-// SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, etc.
+/*
+// Example Supabase Edge Function:
+// File: functions/example-function/index.ts
+
+// Import Deno's standard library HTTP server (in the Supabase Edge runtime)
+// import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// This serve function would be provided by Deno in the Supabase Edge Runtime
+// Here we're creating a mock version for reference
+const serve = (handler) => {
+  console.log('Edge function mock: Handler registered')
+  return handler
+}
+
+// The main handler function for the edge function
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -20,41 +36,33 @@ serve(async (req) => {
   }
 
   try {
-    const { to, subject, taskTitle, dueDate } = await req.json()
+    const { example, param } = await req.json()
 
-    if (!to || !subject || !taskTitle || !dueDate) {
+    if (!example || !param) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
 
-    // In a real implementation, you would use a service like SendGrid, Resend, or SMTP
-    // This is just a placeholder example
-    console.log(`Sending email to ${to}:`)
-    console.log(`Subject: ${subject}`)
-    console.log(`Task: ${taskTitle}, Due: ${dueDate}`)
+    // Do something with the parameters
+    console.log(`Processing request with: ${example}, ${param}`)
 
-    // Example email HTML content
-    const emailContent = `
-      <h1>Task Reminder</h1>
-      <p>This is a reminder that your task "${taskTitle}" is due in 12 hours (${dueDate}).</p>
-      <p>Please make sure to complete it on time!</p>
-    `
-
-    // Mock successful email sending
-    console.log('Email sent successfully (mock)')
-
+    // Return a success response
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, message: "Operation completed" }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
     console.error('Error processing request:', error)
     
     return new Response(
-      JSON.stringify({ error: 'Failed to send email' }),
+      JSON.stringify({ error: 'Function execution failed' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
 })
+*/
+
+// Note: This file is just an example and doesn't actually run in the browser.
+// To use Edge Functions, you need to create them in the Supabase dashboard.

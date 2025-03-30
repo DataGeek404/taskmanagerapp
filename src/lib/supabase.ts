@@ -38,8 +38,6 @@ export interface Task {
   created_at: string;
   /** Task due date (optional) */
   due_date?: string;
-  /** Whether email notifications are enabled for this task */
-  notifications_enabled?: boolean;
 }
 
 /**
