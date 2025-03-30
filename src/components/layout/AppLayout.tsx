@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle, BarChart } from 'lucide-react';
+import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle, BarChart, ListFilter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TaskStatus } from '@/lib/supabase';
 import { useTask } from '@/lib/task-context';
@@ -75,8 +75,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
             <span>New Task</span>
           </Button>
           
-          <div className="px-3 py-2">
-            <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400 mb-2">TASK FILTERS</h3>
+          {/* Task Filters Module */}
+          <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+            <div className="flex items-center mb-2">
+              <ListFilter className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" />
+              <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">TASK FILTERS</h3>
+            </div>
             <div className="space-y-1">
               <Button
                 variant={activeFilter === 'all' ? 'secondary' : 'ghost'}
@@ -113,6 +117,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
             </div>
           </div>
           
+          {/* Analytics Button */}
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 mt-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
