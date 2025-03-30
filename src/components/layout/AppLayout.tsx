@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle, BarChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TaskStatus } from '@/lib/supabase';
 import { useTask } from '@/lib/task-context';
@@ -112,6 +112,15 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
               </Button>
             </div>
           </div>
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 mt-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            onClick={() => navigate('/analytics')}
+          >
+            <BarChart className="h-5 w-5 text-purple-500 group-hover:text-purple-600" />
+            <span>Analytics</span>
+          </Button>
         </div>
       </SidebarContent>
       <SidebarFooter className="px-4 py-4 border-t mt-auto">
