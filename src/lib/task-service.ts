@@ -58,7 +58,7 @@ export const fetchUserTasks = async (
  * @returns Whether the operation was successful
  */
 export const createUserTask = async (
-  taskData: { title: string, description: string, dueDate: string | null },
+  taskData: { title: string, description: string },
   userId: string,
   dbInitialized: boolean,
   toast: ReturnType<typeof useToast>['toast']
@@ -77,7 +77,6 @@ export const createUserTask = async (
       description: taskData.description,
       status: 'pending' as TaskStatus,
       user_id: userId,
-      due_date: taskData.dueDate,
     }).select();
 
     if (error) throw error;

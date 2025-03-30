@@ -36,8 +36,6 @@ export interface Task {
   user_id: string;
   /** Task creation timestamp */
   created_at: string;
-  /** Task due date (optional) */
-  due_date?: string;
 }
 
 /**

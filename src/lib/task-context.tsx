@@ -22,7 +22,7 @@ interface TaskContextType {
   isLoading: boolean;
   filter: TaskStatus | 'all';
   setFilter: (filter: TaskStatus | 'all') => void;
-  createTask: (title: string, description: string, dueDate?: string | null) => Promise<void>;
+  createTask: (title: string, description: string) => Promise<void>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   refreshTasks: () => Promise<void>;
@@ -83,13 +83,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const createTask = async (
     title: string, 
-    description: string, 
-    dueDate: string | null = null
+    description: string
   ) => {
     if (!user) throw new Error('You must be logged in to create tasks');
     
     await createUserTask(
-      { title, description, dueDate },
+      { title, description },
       user.id,
       dbInitialized,
       toast

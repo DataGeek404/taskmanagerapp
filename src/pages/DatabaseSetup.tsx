@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +19,6 @@ CREATE TABLE IF NOT EXISTS public.tasks (
   description TEXT,
   status TEXT NOT NULL DEFAULT 'pending',
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  due_date TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
