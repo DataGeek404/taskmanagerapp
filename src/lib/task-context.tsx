@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, Task, TaskStatus } from './supabase';
 import { useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { initializeDatabase, createCustomFunction, setupTasksTable } from './supabase-migrations';
+import { initializeDatabase, createCustomFunction, setupTasksTable, executeDirectSQL } from './supabase-migrations';
 
 interface TaskContextType {
   tasks: Task[];
@@ -14,6 +14,7 @@ interface TaskContextType {
   createTask: (title: string, description: string) => Promise<void>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
+  refreshTasks: () => Promise<void>;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -33,17 +34,39 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!user) return;
       
       try {
-        // Initialize database structure
-        await initializeDatabase();
-        await createCustomFunction();
-        const success = await setupTasksTable();
+        console.log("Initializing database...");
+        // First try using executeDirectSQL which directly creates the table
+        const directSuccess = await executeDirectSQL();
         
-        if (success) {
+        if (directSuccess) {
+          console.log("Database initialized with direct SQL");
           setDbInitialized(true);
+          return;
+        }
+        
+        // If direct SQL fails, try the other methods
+        const initSuccess = await initializeDatabase();
+        
+        if (initSuccess) {
+          await createCustomFunction();
+          const setupSuccess = await setupTasksTable();
+          
+          if (setupSuccess) {
+            console.log("Database initialized with RPC method");
+            setDbInitialized(true);
+          } else {
+            console.error("Failed to set up tasks table");
+            toast({
+              title: 'Database initialization warning',
+              description: 'Could not set up the database automatically. Some features might require manual setup.',
+              variant: 'destructive',
+            });
+          }
         } else {
+          console.error("Failed to initialize database");
           toast({
-            title: 'Database initialization error',
-            description: 'Could not set up the database. Some features might not work properly.',
+            title: 'Database initialization warning',
+            description: 'Could not initialize the database. Some features might require manual setup.',
             variant: 'destructive',
           });
         }
@@ -51,7 +74,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Database initialization error:', error);
         toast({
           title: 'Database initialization error',
-          description: error.message || 'Could not set up the database.',
+          description: error.message || 'Could not set up the database automatically.',
           variant: 'destructive',
         });
       }
@@ -60,8 +83,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initDB();
   }, [user, toast]);
 
-  // Fetch tasks when user changes
-  useEffect(() => {
+  // Function to fetch tasks
+  const fetchTasks = async () => {
     if (!user) {
       setTasks([]);
       setFilteredTasks([]);
@@ -69,63 +92,70 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    const fetchTasks = async () => {
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('tasks')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+    try {
+      setIsLoading(true);
+      console.log("Fetching tasks for user:", user.id);
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-        if (error) {
-          // If the error is because the table doesn't exist, show a more user-friendly message
-          if (error.code === '42P01') {
-            console.warn('Tasks table does not exist yet. It will be created when you add your first task.');
-            setTasks([]);
-          } else {
-            throw error;
-          }
+      if (error) {
+        // If the error is because the table doesn't exist, show a more user-friendly message
+        if (error.code === '42P01') {
+          console.warn('Tasks table does not exist yet. It will be created when you add your first task.');
+          setTasks([]);
         } else {
-          setTasks(data || []);
+          throw error;
         }
-      } catch (error: any) {
-        console.error('Error fetching tasks:', error);
-        // Only show toast for errors that are not related to the table not existing
-        if (error.code !== '42P01') {
-          toast({
-            title: 'Error fetching tasks',
-            description: error.message || 'Please try again later',
-            variant: 'destructive',
-          });
-        }
-      } finally {
-        setIsLoading(false);
+      } else {
+        console.log("Tasks fetched:", data?.length || 0);
+        setTasks(data || []);
       }
-    };
+    } catch (error: any) {
+      console.error('Error fetching tasks:', error);
+      // Only show toast for errors that are not related to the table not existing
+      if (error.code !== '42P01') {
+        toast({
+          title: 'Error fetching tasks',
+          description: error.message || 'Please try again later',
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  // Fetch tasks when user changes or database is initialized
+  useEffect(() => {
     fetchTasks();
 
-    // Subscribe to changes
-    const tasksSubscription = supabase
-      .channel('tasks-channel')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'tasks',
-          filter: `user_id=eq.${user.id}`
-        }, 
-        () => {
-          fetchTasks();
-        }
-      )
-      .subscribe();
+    // Only set up subscription if user exists
+    if (user) {
+      // Subscribe to changes
+      const tasksSubscription = supabase
+        .channel('tasks-channel')
+        .on('postgres_changes', 
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'tasks',
+            filter: `user_id=eq.${user.id}`
+          }, 
+          (payload) => {
+            console.log('Database change detected:', payload);
+            fetchTasks();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      tasksSubscription.unsubscribe();
-    };
-  }, [user, toast, dbInitialized]);
+      return () => {
+        tasksSubscription.unsubscribe();
+      };
+    }
+  }, [user, dbInitialized]);
 
   // Filter tasks when filter or tasks change
   useEffect(() => {
@@ -136,27 +166,36 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [filter, tasks]);
 
+  // Public method to refresh tasks
+  const refreshTasks = async () => {
+    await fetchTasks();
+  };
+
   const createTask = async (title: string, description: string) => {
     try {
       if (!user) throw new Error('You must be logged in to create tasks');
 
-      // Check if the database has been initialized
+      console.log("Creating task:", { title, description });
+      
+      // Attempt to initialize database if not already done
       if (!dbInitialized) {
-        // Try to initialize it again
-        await initializeDatabase();
-        await createCustomFunction();
-        await setupTasksTable();
+        await executeDirectSQL();
       }
 
-      const { error } = await supabase.from('tasks').insert({
+      const { data, error } = await supabase.from('tasks').insert({
         title,
         description,
         status: 'pending' as TaskStatus,
         user_id: user.id,
-      });
+      }).select();
 
       if (error) throw error;
 
+      console.log("Task created:", data);
+      
+      // Fetch tasks to update the list
+      fetchTasks();
+      
       toast({
         title: 'Task created',
         description: 'Your task has been created successfully',
@@ -176,6 +215,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error('You must be logged in to update tasks');
 
+      console.log("Updating task:", id, data);
+      
       const { error } = await supabase
         .from('tasks')
         .update(data)
@@ -183,6 +224,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', user.id);
 
       if (error) throw error;
+      
+      // Fetch tasks to update the list
+      fetchTasks();
 
       toast({
         title: 'Task updated',
@@ -203,6 +247,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error('You must be logged in to delete tasks');
 
+      console.log("Deleting task:", id);
+      
       const { error } = await supabase
         .from('tasks')
         .delete()
@@ -210,6 +256,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', user.id);
 
       if (error) throw error;
+      
+      // Fetch tasks to update the list
+      fetchTasks();
 
       toast({
         title: 'Task deleted',
@@ -237,6 +286,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createTask,
         updateTask,
         deleteTask,
+        refreshTasks,
       }}
     >
       {children}
