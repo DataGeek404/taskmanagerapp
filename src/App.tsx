@@ -25,7 +25,6 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
-            {/* Protected Routes */}
             <Route 
               path="/" 
               element={
@@ -51,7 +50,6 @@ const App = () => (
               } 
             />
             
-            {/* Guest Routes */}
             <Route 
               path="/login" 
               element={
@@ -69,7 +67,6 @@ const App = () => (
               } 
             />
             
-            {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TaskProvider>

@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
@@ -260,7 +261,7 @@ Sidebar.displayName = "Sidebar"
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
+>(({ className, onClick, children, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
 
   return (
@@ -276,8 +277,8 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
+      {children || <PanelLeft />}
+      {!children && <span className="sr-only">Toggle Sidebar</span>}
     </Button>
   )
 })

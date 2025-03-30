@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -37,10 +36,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         />
         <main className="flex-1 overflow-auto p-6 md:p-8">
           <div className="md:hidden flex items-center mb-6">
-            <SidebarTrigger asChild>
-              <Button variant="outline" size="icon" className="mr-2">
-                <List className="h-5 w-5" />
-              </Button>
+            <SidebarTrigger className="mr-2">
+              <List className="h-5 w-5" />
             </SidebarTrigger>
             <h1 className="text-xl font-semibold">Taskoriq</h1>
           </div>
