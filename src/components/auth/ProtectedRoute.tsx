@@ -22,8 +22,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   // If user is logged in, render the child component
-  // Make sure we're returning a single element, not multiple
-  return <>{children}</>;
+  // Ensure we return the children directly without adding extra fragments
+  return children;
 };
 
 export default ProtectedRoute;
