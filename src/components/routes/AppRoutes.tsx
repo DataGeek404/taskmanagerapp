@@ -6,6 +6,7 @@ import Register from "@/pages/Register";
 import NewTask from "@/pages/NewTask";
 import EditTask from "@/pages/EditTask";
 import NotFound from "@/pages/NotFound";
+import DatabaseSetup from "@/pages/DatabaseSetup";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import GuestRoute from "@/components/auth/GuestRoute";
 
@@ -56,6 +57,15 @@ const AppRoutes = () => {
           <GuestRoute>
             <Register />
           </GuestRoute>
+        } 
+      />
+      
+      <Route 
+        path="/db-setup" 
+        element={
+          <ProtectedRoute>
+            <DatabaseSetup />
+          </ProtectedRoute>
         } 
       />
       
