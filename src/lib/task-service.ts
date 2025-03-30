@@ -1,7 +1,7 @@
 
 import { supabase, Task, TaskStatus } from './supabase';
 import { useToast } from '@/hooks/use-toast';
-import { executeDirectSQL } from './supabase-migrations';
+import { executeDirectSQL } from './database';
 
 /**
  * Fetches all tasks for a user
