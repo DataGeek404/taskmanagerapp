@@ -42,6 +42,7 @@ const AppRoutes = () => {
         } 
       />
       
+      {/* Guest routes */}
       <Route 
         path="/login" 
         element={
