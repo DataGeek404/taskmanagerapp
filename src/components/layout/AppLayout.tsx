@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -39,7 +40,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <SidebarTrigger className="mr-2">
               <List className="h-5 w-5" />
             </SidebarTrigger>
-            <h1 className="text-xl font-semibold">Taskoriq</h1>
+            <h1 className="text-xl font-semibold">James Task Manager</h1>
           </div>
           {children}
         </main>
@@ -61,7 +62,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
   return (
     <Sidebar className="border-r border-border">
       <SidebarHeader className="px-6 py-4">
-        <h1 className="text-2xl font-bold">Taskoriq</h1>
+        <h1 className="text-2xl font-bold">James Task Manager</h1>
       </SidebarHeader>
       <SidebarContent className="px-4">
         <div className="space-y-1 mb-6">
