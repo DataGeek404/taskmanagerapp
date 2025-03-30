@@ -3,7 +3,7 @@ import { useTask } from '@/lib/task-context';
 import TaskCard from '@/components/tasks/TaskCard';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, Database, LineChart, AlertCircle } from 'lucide-react';
+import { Plus, Database, LineChart, AlertCircle, BarChart } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -66,13 +66,23 @@ const Dashboard = () => {
               {getTasksCount()}
             </p>
           </div>
-          <Button 
-            onClick={() => navigate('/new-task')}
-            className="group transition-all hover:shadow-md"
-          >
-            <Plus className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-            New Task
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/analytics')}
+              className="group transition-all hover:shadow-md"
+            >
+              <BarChart className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+              Analytics
+            </Button>
+            <Button 
+              onClick={() => navigate('/new-task')}
+              className="group transition-all hover:shadow-md"
+            >
+              <Plus className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+              New Task
+            </Button>
+          </div>
         </div>
 
         {tableExists === false && (
