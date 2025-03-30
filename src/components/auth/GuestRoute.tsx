@@ -20,7 +20,8 @@ const GuestRoute = ({ children }: GuestRouteProps) => {
     return <Navigate to="/" replace />;
   }
 
-  // If not logged in, render children (login/register form)
+  // If not logged in, render the child component
+  // Make sure we're returning a single element, not multiple
   return <>{children}</>;
 };
 

@@ -1,5 +1,5 @@
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/auth-context';
 
@@ -21,7 +21,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If user is logged in, render children
+  // If user is logged in, render the child component
+  // Make sure we're returning a single element, not multiple
   return <>{children}</>;
 };
 
