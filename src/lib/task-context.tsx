@@ -1,9 +1,20 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase, Task, TaskStatus } from './supabase';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { Task, TaskStatus } from './supabase';
 import { useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { initializeDatabase, createCustomFunction, setupTasksTable, executeDirectSQL } from './supabase-migrations';
+import { 
+  initializeTaskDatabase, 
+  checkTasksTableExists 
+} from './db-initializer';
+import { 
+  fetchUserTasks, 
+  createUserTask, 
+  updateUserTask, 
+  deleteUserTask 
+} from './task-service';
+import { useTaskFilter } from './use-task-filter';
+import { useTaskSubscription } from './use-task-subscription';
 
 interface TaskContextType {
   tasks: Task[];
@@ -24,143 +35,47 @@ const emptyTasks: Task[] = [];
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tasks, setTasks] = useState<Task[]>(emptyTasks);
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>(emptyTasks);
-  const [filter, setFilter] = useState<TaskStatus | 'all'>(defaultFilter);
   const [isLoading, setIsLoading] = useState(true);
   const [dbInitialized, setDbInitialized] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { filteredTasks, filter, setFilter } = useTaskFilter(tasks);
 
   // Database initialization
   useEffect(() => {
     async function initDB() {
       if (!user) return;
       
-      try {
-        console.log("Initializing database...");
-        const directSuccess = await executeDirectSQL();
-        
-        if (directSuccess) {
-          console.log("Database initialized with direct SQL");
-          setDbInitialized(true);
-          return;
-        }
-        
-        const initSuccess = await initializeDatabase();
-        
-        if (initSuccess) {
-          await createCustomFunction();
-          const setupSuccess = await setupTasksTable();
-          
-          if (setupSuccess) {
-            console.log("Database initialized with RPC method");
-            setDbInitialized(true);
-          } else {
-            console.error("Failed to set up tasks table");
-            toast({
-              title: 'Database initialization warning',
-              description: 'Could not set up the database automatically. Some features might require manual setup.',
-              variant: 'destructive',
-            });
-          }
-        } else {
-          console.error("Failed to initialize database");
-          toast({
-            title: 'Database initialization warning',
-            description: 'Could not initialize the database. Some features might require manual setup.',
-            variant: 'destructive',
-          });
-        }
-      } catch (error: any) {
-        console.error('Database initialization error:', error);
-        toast({
-          title: 'Database initialization error',
-          description: error.message || 'Could not set up the database automatically.',
-          variant: 'destructive',
-        });
-      }
+      const isInitialized = await initializeTaskDatabase(user.id, toast);
+      setDbInitialized(isInitialized);
     }
     
     initDB();
   }, [user, toast]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     if (!user) {
       setTasks([]);
-      setFilteredTasks([]);
       setIsLoading(false);
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log("Fetching tasks for user:", user.id);
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        if (error.code === '42P01') {
-          console.warn('Tasks table does not exist yet. It will be created when you add your first task.');
-          setTasks([]);
-        } else {
-          throw error;
-        }
-      } else {
-        console.log("Tasks fetched:", data?.length || 0);
-        setTasks(data || []);
-      }
-    } catch (error: any) {
-      console.error('Error fetching tasks:', error);
-      if (error.code !== '42P01') {
-        toast({
-          title: 'Error fetching tasks',
-          description: error.message || 'Please try again later',
-          variant: 'destructive',
-        });
-      }
+      const tasksData = await fetchUserTasks(user.id, toast);
+      setTasks(tasksData);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, toast]);
 
-  // Initial fetch and subscription setup
+  // Initial fetch
   useEffect(() => {
     fetchTasks();
+  }, [fetchTasks, dbInitialized]);
 
-    if (user) {
-      const tasksSubscription = supabase
-        .channel('tasks-channel')
-        .on('postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'tasks',
-            filter: `user_id=eq.${user.id}`
-          }, 
-          (payload) => {
-            console.log('Database change detected:', payload);
-            fetchTasks();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        tasksSubscription.unsubscribe();
-      };
-    }
-  }, [user, dbInitialized]);
-
-  // Apply filters to tasks
-  useEffect(() => {
-    if (filter === 'all') {
-      setFilteredTasks(tasks);
-    } else {
-      setFilteredTasks(tasks.filter(task => task.status === filter));
-    }
-  }, [filter, tasks]);
+  // Set up real-time subscription
+  useTaskSubscription(user?.id, fetchTasks);
 
   const refreshTasks = async () => {
     await fetchTasks();
@@ -171,104 +86,30 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     description: string, 
     dueDate: string | null = null
   ) => {
-    try {
-      if (!user) throw new Error('You must be logged in to create tasks');
-
-      console.log("Creating task:", { title, description, dueDate });
-      
-      if (!dbInitialized) {
-        await executeDirectSQL();
-      }
-
-      const { data, error } = await supabase.from('tasks').insert({
-        title,
-        description,
-        status: 'pending' as TaskStatus,
-        user_id: user.id,
-        due_date: dueDate,
-      }).select();
-
-      if (error) throw error;
-
-      console.log("Task created:", data);
-      
-      fetchTasks();
-      
-      toast({
-        title: 'Task created',
-        description: 'Your task has been created successfully',
-      });
-    } catch (error: any) {
-      console.error('Error creating task:', error);
-      toast({
-        title: 'Error creating task',
-        description: error.message || 'Please try again later',
-        variant: 'destructive',
-      });
-      throw error;
-    }
+    if (!user) throw new Error('You must be logged in to create tasks');
+    
+    await createUserTask(
+      { title, description, dueDate },
+      user.id,
+      dbInitialized,
+      toast
+    );
+    
+    await fetchTasks();
   };
 
   const updateTask = async (id: string, data: Partial<Task>) => {
-    try {
-      if (!user) throw new Error('You must be logged in to update tasks');
-
-      console.log("Updating task:", id, data);
-      
-      const { error } = await supabase
-        .from('tasks')
-        .update(data)
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      
-      fetchTasks();
-
-      toast({
-        title: 'Task updated',
-        description: 'Your task has been updated successfully',
-      });
-    } catch (error: any) {
-      console.error('Error updating task:', error);
-      toast({
-        title: 'Error updating task',
-        description: error.message || 'Please try again later',
-        variant: 'destructive',
-      });
-      throw error;
-    }
+    if (!user) throw new Error('You must be logged in to update tasks');
+    
+    await updateUserTask(id, data, user.id, toast);
+    await fetchTasks();
   };
 
   const deleteTask = async (id: string) => {
-    try {
-      if (!user) throw new Error('You must be logged in to delete tasks');
-
-      console.log("Deleting task:", id);
-      
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      
-      fetchTasks();
-
-      toast({
-        title: 'Task deleted',
-        description: 'Your task has been deleted successfully',
-      });
-    } catch (error: any) {
-      console.error('Error deleting task:', error);
-      toast({
-        title: 'Error deleting task',
-        description: error.message || 'Please try again later',
-        variant: 'destructive',
-      });
-      throw error;
-    }
+    if (!user) throw new Error('You must be logged in to delete tasks');
+    
+    await deleteUserTask(id, user.id, toast);
+    await fetchTasks();
   };
 
   const contextValue: TaskContextType = {
