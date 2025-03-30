@@ -16,7 +16,7 @@ James Task Manager is a responsive web application that helps users manage their
 
 ## Live Deployment
 
-**Live URL**: [https://preview--taskoriq.lovable.app](https://preview--taskoriq.lovable.app)
+**Live URL**: [https://taskoriq.vercel.app/]
 
 ## Technology Stack
 
