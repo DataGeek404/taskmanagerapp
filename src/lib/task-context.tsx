@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, Task, TaskStatus } from './supabase';
 import { useAuth } from './auth-context';
@@ -19,23 +18,24 @@ interface TaskContextType {
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
+const defaultFilter: TaskStatus | 'all' = 'all';
+const emptyTasks: Task[] = [];
+
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
-  const [filter, setFilter] = useState<TaskStatus | 'all'>('all');
+  const [tasks, setTasks] = useState<Task[]>(emptyTasks);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>(emptyTasks);
+  const [filter, setFilter] = useState<TaskStatus | 'all'>(defaultFilter);
   const [isLoading, setIsLoading] = useState(true);
   const [dbInitialized, setDbInitialized] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Initialize database when the app loads
   useEffect(() => {
     async function initDB() {
       if (!user) return;
       
       try {
         console.log("Initializing database...");
-        // First try using executeDirectSQL which directly creates the table
         const directSuccess = await executeDirectSQL();
         
         if (directSuccess) {
@@ -44,7 +44,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         
-        // If direct SQL fails, try the other methods
         const initSuccess = await initializeDatabase();
         
         if (initSuccess) {
@@ -83,7 +82,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initDB();
   }, [user, toast]);
 
-  // Function to fetch tasks
   const fetchTasks = async () => {
     if (!user) {
       setTasks([]);
@@ -102,7 +100,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .order('created_at', { ascending: false });
 
       if (error) {
-        // If the error is because the table doesn't exist, show a more user-friendly message
         if (error.code === '42P01') {
           console.warn('Tasks table does not exist yet. It will be created when you add your first task.');
           setTasks([]);
@@ -115,7 +112,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error: any) {
       console.error('Error fetching tasks:', error);
-      // Only show toast for errors that are not related to the table not existing
       if (error.code !== '42P01') {
         toast({
           title: 'Error fetching tasks',
@@ -128,13 +124,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Fetch tasks when user changes or database is initialized
   useEffect(() => {
     fetchTasks();
 
-    // Only set up subscription if user exists
     if (user) {
-      // Subscribe to changes
       const tasksSubscription = supabase
         .channel('tasks-channel')
         .on('postgres_changes', 
@@ -157,7 +150,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, dbInitialized]);
 
-  // Filter tasks when filter or tasks change
   useEffect(() => {
     if (filter === 'all') {
       setFilteredTasks(tasks);
@@ -166,7 +158,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [filter, tasks]);
 
-  // Public method to refresh tasks
   const refreshTasks = async () => {
     await fetchTasks();
   };
@@ -177,7 +168,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log("Creating task:", { title, description });
       
-      // Attempt to initialize database if not already done
       if (!dbInitialized) {
         await executeDirectSQL();
       }
@@ -193,7 +183,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log("Task created:", data);
       
-      // Fetch tasks to update the list
       fetchTasks();
       
       toast({
@@ -225,7 +214,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
       
-      // Fetch tasks to update the list
       fetchTasks();
 
       toast({
@@ -257,7 +245,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
       
-      // Fetch tasks to update the list
       fetchTasks();
 
       toast({
@@ -275,20 +262,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const contextValue: TaskContextType = {
+    tasks,
+    filteredTasks,
+    isLoading,
+    filter,
+    setFilter,
+    createTask,
+    updateTask,
+    deleteTask,
+    refreshTasks,
+  };
+
   return (
-    <TaskContext.Provider
-      value={{
-        tasks,
-        filteredTasks,
-        isLoading,
-        filter,
-        setFilter,
-        createTask,
-        updateTask,
-        deleteTask,
-        refreshTasks,
-      }}
-    >
+    <TaskContext.Provider value={contextValue}>
       {children}
     </TaskContext.Provider>
   );
