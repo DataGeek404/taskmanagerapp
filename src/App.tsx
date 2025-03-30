@@ -15,7 +15,6 @@ import NotFound from "./pages/NotFound";
 import DatabaseSetup from "./pages/DatabaseSetup";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GuestRoute from "./components/auth/GuestRoute";
-import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -27,12 +26,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
-            {/* Public route - Landing page */}
-            <Route path="/" element={<Index />} />
-            
-            {/* Protected routes */}
             <Route 
-              path="/dashboard" 
+              path="/" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
