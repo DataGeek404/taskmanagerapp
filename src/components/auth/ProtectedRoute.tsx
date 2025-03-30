@@ -21,9 +21,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If user is logged in, render the child component
-  // We need to ensure we're returning exactly one React element
-  return <>{children}</>;
+  // Return the child component directly without any wrapping elements
+  // This is critical for React.Children.only() to work properly
+  return children;
 };
 
 export default ProtectedRoute;
