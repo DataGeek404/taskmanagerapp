@@ -1,4 +1,8 @@
 
+/**
+ * Authentication form component for login and registration.
+ * Handles form validation and submission for authentication operations.
+ */
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -16,13 +20,20 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { useNavigate } from 'react-router-dom';
 
+/** Available form types */
 type AuthFormType = 'login' | 'register';
 
+/**
+ * Zod schema for login form validation
+ */
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
+/**
+ * Zod schema for registration form validation
+ */
 const registerSchema = loginSchema.extend({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
@@ -34,6 +45,13 @@ const registerSchema = loginSchema.extend({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+/**
+ * Authentication form component that provides login and registration functionality.
+ * 
+ * @param {Object} props - Component props
+ * @param {AuthFormType} props.type - Type of form to display ('login' or 'register')
+ * @returns {JSX.Element} The rendered form component
+ */
 export const AuthForm = ({ type }: { type: AuthFormType }) => {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
@@ -49,6 +67,11 @@ export const AuthForm = ({ type }: { type: AuthFormType }) => {
       : { email: '', password: '', confirmPassword: '', name: '' },
   });
 
+  /**
+   * Handles form submission for both login and registration.
+   * 
+   * @param {LoginFormValues | RegisterFormValues} values - Form values
+   */
   const onSubmit = async (values: LoginFormValues | RegisterFormValues) => {
     try {
       setLoading(true);

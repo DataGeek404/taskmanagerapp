@@ -1,69 +1,196 @@
-# Welcome to your Lovable project
 
-## Project info
+# James Task Manager
 
-**URL**: https://lovable.dev/projects/8db90c00-1116-444c-8456-b0d62819bcea
+A personal task management application built with React, TypeScript, and Supabase.
 
-## How can I edit this code?
+![James Task Manager](https://i.imgur.com/8db90c00.png)
 
-There are several ways of editing your application.
+## Project Overview
 
-**Use Lovable**
+James Task Manager is a responsive web application that helps users manage their tasks efficiently. It offers features such as:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8db90c00-1116-444c-8456-b0d62819bcea) and start prompting.
+- User authentication (sign up, login, logout)
+- Task creation, editing, and deletion
+- Task status management (pending, in-progress, completed)
+- Responsive design for mobile and desktop
 
-Changes made via Lovable will be committed automatically to this repo.
+## Live Deployment
 
-**Use your preferred IDE**
+**Live URL**: [https://preview--taskoriq.lovable.app](https://preview--taskoriq.lovable.app)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Technology Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Frontend**: React, TypeScript, Vite
+- **UI Components**: shadcn-ui, Tailwind CSS
+- **State Management**: React Context API, React Query
+- **Backend & Database**: Supabase (Authentication, PostgreSQL)
+- **Routing**: React Router
 
-Follow these steps:
+## Project Setup
 
+### Prerequisites
+
+- Node.js (v16+)
+- npm (v7+)
+
+### Installation
+
+1. Clone the repository:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone <repository-url>
+cd james-task-manager
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+```sh
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+This will start the application on http://localhost:5173 (or another port if 5173 is in use).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project Structure
 
-**Use GitHub Codespaces**
+```
+src/
+├── components/       # UI components
+│   ├── auth/         # Authentication components
+│   ├── layout/       # Layout components
+│   ├── routes/       # Routing components
+│   ├── tasks/        # Task-related components
+│   └── ui/           # UI components from shadcn
+├── hooks/            # Custom React hooks
+├── lib/              # Utility libraries and contexts
+├── pages/            # Page components
+└── main.tsx          # Application entry point
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## API Documentation
 
-## What technologies are used for this project?
+### Authentication API
 
-This project is built with .
+James Task Manager uses Supabase Authentication for user management.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+#### Authentication Endpoints:
 
-## How can I deploy this project?
+- **Sign Up**:
+  ```typescript
+  const { error } = await supabase.auth.signUp({
+    email: string,
+    password: string,
+    options: {
+      data: { name: string }
+    }
+  });
+  ```
 
-Simply open [Lovable](https://lovable.dev/projects/8db90c00-1116-444c-8456-b0d62819bcea) and click on Share -> Publish.
+- **Sign In**:
+  ```typescript
+  const { error } = await supabase.auth.signInWithPassword({
+    email: string,
+    password: string
+  });
+  ```
 
-## I want to use a custom domain - is that possible?
+- **Sign Out**:
+  ```typescript
+  const { error } = await supabase.auth.signOut();
+  ```
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- **Get Session**:
+  ```typescript
+  const { data: { session }, error } = await supabase.auth.getSession();
+  ```
+
+### Tasks API
+
+Tasks are stored in the Supabase database and accessed through the client SDK.
+
+#### Task Object Structure:
+
+```typescript
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  user_id: string;
+  created_at: string;
+}
+```
+
+#### Task Endpoints:
+
+- **Fetch Tasks**:
+  ```typescript
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('user_id', userId);
+  ```
+
+- **Create Task**:
+  ```typescript
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert({
+      title: string,
+      description: string,
+      status: 'pending' | 'in-progress' | 'completed',
+      user_id: string
+    });
+  ```
+
+- **Update Task**:
+  ```typescript
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({
+      title: string,
+      description: string,
+      status: 'pending' | 'in-progress' | 'completed'
+    })
+    .eq('id', taskId);
+  ```
+
+- **Delete Task**:
+  ```typescript
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', taskId);
+  ```
+
+## Security Considerations
+
+- Authentication is handled by Supabase which provides secure token-based authentication
+- Row Level Security (RLS) is enabled in Supabase to ensure users can only access their own tasks
+- Environment variables are used for storing sensitive information
+- Input validation is performed using Zod schema validation
+- HTTPS is used for all communications with the Supabase backend
+
+## Best Practices
+
+- Component-based architecture for better maintainability
+- TypeScript for type safety and improved developer experience
+- Context API for state management
+- React Query for efficient data fetching and caching
+- Tailwind CSS for responsive design
+- Shadcn/UI for consistent component styling
+- JSDoc documentation for better code readability
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'Add my feature'`
+4. Push to the branch: `git push origin feature/my-feature`
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
