@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle, BarChart, ListFilter, ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -74,7 +74,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
   isAnalyticsPage 
 }) => {
   const navigate = useNavigate();
-  const { useSidebar } = require('@/components/ui/sidebar');
   const { setOpenMobile } = useSidebar();
 
   const handleFilterClick = (status: TaskStatus | 'all') => {
