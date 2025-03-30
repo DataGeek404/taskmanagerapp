@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TaskCard from './TaskCard';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
+import { TaskStatus } from '@/lib/supabase';
 
 // Mock the task context
 vi.mock('@/lib/task-context', () => ({
@@ -17,7 +18,7 @@ describe('TaskCard', () => {
     id: '1',
     title: 'Test Task',
     description: 'This is a test task',
-    status: 'pending',
+    status: 'pending' as TaskStatus,
     user_id: 'user123',
     created_at: '2023-01-01T00:00:00Z',
   };
@@ -47,7 +48,7 @@ describe('TaskCard', () => {
   });
 
   it('renders correct status badge for in-progress task', () => {
-    const inProgressTask = { ...mockTask, status: 'in-progress' };
+    const inProgressTask = { ...mockTask, status: 'in-progress' as TaskStatus };
     render(
       <BrowserRouter>
         <TaskCard task={inProgressTask} />
@@ -59,7 +60,7 @@ describe('TaskCard', () => {
   });
 
   it('renders correct status badge for completed task', () => {
-    const completedTask = { ...mockTask, status: 'completed' };
+    const completedTask = { ...mockTask, status: 'completed' as TaskStatus };
     render(
       <BrowserRouter>
         <TaskCard task={completedTask} />
