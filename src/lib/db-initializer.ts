@@ -1,6 +1,11 @@
 
 import { supabase } from './supabase';
-import { executeDirectSQL, initializeDatabase, createCustomFunction, setupTasksTable } from './supabase-migrations';
+import { 
+  executeDirectSQL, 
+  initializeDatabase, 
+  createCustomFunction, 
+  setupTasksTable 
+} from './database';
 import { useToast } from '@/hooks/use-toast';
 
 /**

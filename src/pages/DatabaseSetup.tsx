@@ -3,7 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, AlertCircle, RefreshCw, Database } from 'lucide-react';
-import { initializeDatabase, createCustomFunction, setupTasksTable, executeDirectSQL } from '@/lib/supabase-migrations';
+import { 
+  initializeDatabase, 
+  createCustomFunction, 
+  setupTasksTable, 
+  executeDirectSQL 
+} from '@/lib/database';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
