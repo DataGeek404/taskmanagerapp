@@ -1,21 +1,13 @@
 
 import { supabase } from './supabase';
-import { useToast } from '@/hooks/use-toast';
 
 export async function setupTasksTable() {
-  const { toast } = useToast();
-  
   try {
     // Create tasks table if it doesn't exist
     const { error } = await supabase.rpc('create_tasks_table');
     
     if (error && error.message !== 'function "create_tasks_table" does not exist') {
       console.error('Error creating tasks table:', error);
-      toast({
-        title: 'Database setup error',
-        description: 'Could not set up the tasks table. Please try again later.',
-        variant: 'destructive',
-      });
       return false;
     }
     

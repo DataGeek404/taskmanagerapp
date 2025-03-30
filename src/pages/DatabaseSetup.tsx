@@ -6,12 +6,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { initializeDatabase, createCustomFunction, setupTasksTable } from '@/lib/supabase-migrations';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const DatabaseSetup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleInitializeDatabase = async () => {
     try {
@@ -25,15 +27,29 @@ const DatabaseSetup = () => {
       
       if (success) {
         setSuccess(true);
+        toast({
+          title: 'Database initialized',
+          description: 'Your database has been set up successfully!',
+        });
         setTimeout(() => {
           navigate('/');
         }, 2000);
       } else {
         setError('Database initialization failed. Please try again.');
+        toast({
+          title: 'Database setup error',
+          description: 'Could not set up the database. Please try again.',
+          variant: 'destructive',
+        });
       }
     } catch (error: any) {
       console.error('Error initializing database:', error);
       setError(error.message || 'An unexpected error occurred');
+      toast({
+        title: 'Database setup error',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
