@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2, Clock, ListTodo, Briefcase, BarChart3, Star } from 'lucide-react';
