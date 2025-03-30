@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, Task, TaskStatus } from './supabase';
 import { useAuth } from './auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { initializeDatabase, createCustomFunction, setupTasksTable, executeDirectSQL } from './supabase-migrations';
 
 interface TaskContextType {
   tasks: Task[];
@@ -30,6 +29,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Database initialization
   useEffect(() => {
     async function initDB() {
       if (!user) return;
@@ -124,6 +124,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Initial fetch and subscription setup
   useEffect(() => {
     fetchTasks();
 
@@ -150,6 +151,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, dbInitialized]);
 
+  // Apply filters to tasks
   useEffect(() => {
     if (filter === 'all') {
       setFilteredTasks(tasks);
