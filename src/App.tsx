@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./lib/auth-context";
 import { TaskProvider } from "./lib/task-context";
 import Dashboard from "./pages/Dashboard";
@@ -24,56 +24,54 @@ const App = () => (
         <TaskProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Protected Routes */}
-              <Route 
-                path="/" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/new-task" 
-                element={
-                  <ProtectedRoute>
-                    <NewTask />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/edit-task/:id" 
-                element={
-                  <ProtectedRoute>
-                    <EditTask />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Guest Routes */}
-              <Route 
-                path="/login" 
-                element={
-                  <GuestRoute>
-                    <Login />
-                  </GuestRoute>
-                } 
-              />
-              <Route 
-                path="/register" 
-                element={
-                  <GuestRoute>
-                    <Register />
-                  </GuestRoute>
-                } 
-              />
-              
-              {/* Catch-all Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <Routes>
+            {/* Protected Routes */}
+            <Route 
+              path="/" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/new-task" 
+              element={
+                <ProtectedRoute>
+                  <NewTask />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/edit-task/:id" 
+              element={
+                <ProtectedRoute>
+                  <EditTask />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Guest Routes */}
+            <Route 
+              path="/login" 
+              element={
+                <GuestRoute>
+                  <Login />
+                </GuestRoute>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <GuestRoute>
+                  <Register />
+                </GuestRoute>
+              } 
+            />
+            
+            {/* Catch-all Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </TaskProvider>
       </AuthProvider>
     </TooltipProvider>
