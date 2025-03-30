@@ -15,9 +15,19 @@ import NotFound from "./pages/NotFound";
 import DatabaseSetup from "./pages/DatabaseSetup";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GuestRoute from "./components/auth/GuestRoute";
+import Index from "./pages/Index";
 
+/**
+ * QueryClient instance for React Query
+ * @constant
+ */
 const queryClient = new QueryClient();
 
+/**
+ * @component App
+ * @description Main application component that sets up routing and global providers
+ * @returns {JSX.Element} The rendered application
+ */
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -26,8 +36,12 @@ const App = () => (
           <Toaster />
           <Sonner />
           <Routes>
+            {/* Public landing page */}
+            <Route path="/" element={<Index />} />
+            
+            {/* Protected routes - require authentication */}
             <Route 
-              path="/" 
+              path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -50,7 +64,16 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/db-setup" 
+              element={
+                <ProtectedRoute>
+                  <DatabaseSetup />
+                </ProtectedRoute>
+              } 
+            />
             
+            {/* Guest routes - only accessible when not authenticated */}
             <Route 
               path="/login" 
               element={
@@ -68,15 +91,7 @@ const App = () => (
               } 
             />
             
-            <Route 
-              path="/db-setup" 
-              element={
-                <ProtectedRoute>
-                  <DatabaseSetup />
-                </ProtectedRoute>
-              } 
-            />
-            
+            {/* Fallback for unknown routes */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TaskProvider>

@@ -4,17 +4,33 @@ import { supabase } from './supabase';
 import { useToast } from '@/hooks/use-toast';
 import { Session, User } from '@supabase/supabase-js';
 
+/**
+ * @interface AuthContextType
+ * @description Type definition for the authentication context
+ */
 interface AuthContextType {
+  /** Current user session */
   session: Session | null;
+  /** Current authenticated user */
   user: User | null;
+  /** Loading state for authentication operations */
   loading: boolean;
+  /** Function to sign in a user */
   signIn: (email: string, password: string) => Promise<void>;
+  /** Function to register a new user */
   signUp: (email: string, password: string, name: string) => Promise<void>;
+  /** Function to sign out the current user */
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * @component AuthProvider
+ * @description Provider component that wraps the application to provide authentication context
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components
+ */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -22,6 +38,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    /**
+     * @function setData
+     * @description Initialize the auth state by fetching the current session
+     */
     const setData = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -43,15 +63,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setData();
 
+    // Subscribe to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
+    // Cleanup subscription when component unmounts
     return () => subscription.unsubscribe();
   }, [toast]);
 
+  /**
+   * @function signIn
+   * @description Signs in a user with email and password
+   * @param {string} email - User's email
+   * @param {string} password - User's password
+   */
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -72,6 +100,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * @function signUp
+   * @description Registers a new user
+   * @param {string} email - User's email
+   * @param {string} password - User's password
+   * @param {string} name - User's name
+   */
   const signUp = async (email: string, password: string, name: string) => {
     try {
       const { error } = await supabase.auth.signUp({
@@ -99,6 +134,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * @function signOut
+   * @description Signs out the current user
+   */
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -125,6 +164,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+/**
+ * @function useAuth
+ * @description Custom hook to access the authentication context
+ * @returns {AuthContextType} Authentication context values and functions
+ * @throws {Error} If used outside of AuthProvider
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

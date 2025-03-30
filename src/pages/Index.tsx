@@ -3,8 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2, Clock, ListTodo } from 'lucide-react';
 
+/**
+ * @component Index
+ * @description Landing page component shown to unauthenticated users
+ * @returns {JSX.Element} The rendered landing page
+ */
 const Index = () => {
   const navigate = useNavigate();
+
+  /**
+   * Navigate to login page
+   */
+  const handleGetStarted = () => {
+    navigate('/login');
+  };
+
+  /**
+   * Navigate to registration page
+   */
+  const handleSignUp = () => {
+    navigate('/register');
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-white to-purple-50 dark:from-gray-900 dark:to-gray-800">
@@ -37,7 +56,7 @@ const Index = () => {
             
             <div className="pt-4 space-x-4 animate-fade-in animation-delay-300">
               <Button 
-                onClick={() => navigate('/login')}
+                onClick={handleGetStarted}
                 className="group relative overflow-hidden px-6 py-3 transition-all duration-300 hover:shadow-xl"
                 size="lg"
               >
@@ -47,7 +66,7 @@ const Index = () => {
               </Button>
               <Button 
                 variant="outline" 
-                onClick={() => navigate('/register')}
+                onClick={handleSignUp}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800"
                 size="lg"
               >
