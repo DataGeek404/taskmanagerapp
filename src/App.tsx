@@ -2,7 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./lib/auth-context";
 import { TaskProvider } from "./lib/task-context";
 import Dashboard from "./pages/Dashboard";
@@ -14,7 +14,6 @@ import NotFound from "./pages/NotFound";
 import DatabaseSetup from "./pages/DatabaseSetup";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GuestRoute from "./components/auth/GuestRoute";
-import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -25,8 +24,8 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
-          {/* Public route - Landing page */}
-          <Route path="/" element={<Index />} />
+          {/* Default route redirects to login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           
           {/* Protected routes */}
           <Route 
