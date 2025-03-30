@@ -1,4 +1,3 @@
-
 # James Task Manager
 
 A personal task management application built with React, TypeScript, and Supabase.
@@ -71,13 +70,9 @@ src/
 
 ## API Documentation
 
-### Authentication API
+### Authentication API Endpoints
 
-James Task Manager uses Supabase Authentication for user management.
-
-#### Authentication Endpoints:
-
-- **Sign Up**:
+- **Sign Up**: `POST /auth/signup`
   ```typescript
   const { error } = await supabase.auth.signUp({
     email: string,
@@ -88,7 +83,7 @@ James Task Manager uses Supabase Authentication for user management.
   });
   ```
 
-- **Sign In**:
+- **Sign In**: `POST /auth/login`
   ```typescript
   const { error } = await supabase.auth.signInWithPassword({
     email: string,
@@ -96,36 +91,19 @@ James Task Manager uses Supabase Authentication for user management.
   });
   ```
 
-- **Sign Out**:
+- **Sign Out**: `POST /auth/logout`
   ```typescript
   const { error } = await supabase.auth.signOut();
   ```
 
-- **Get Session**:
+- **Get Current Session**: `GET /auth/session`
   ```typescript
   const { data: { session }, error } = await supabase.auth.getSession();
   ```
 
-### Tasks API
+### Tasks API Endpoints
 
-Tasks are stored in the Supabase database and accessed through the client SDK.
-
-#### Task Object Structure:
-
-```typescript
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  user_id: string;
-  created_at: string;
-}
-```
-
-#### Task Endpoints:
-
-- **Fetch Tasks**:
+- **Fetch Tasks**: `GET /tasks`
   ```typescript
   const { data, error } = await supabase
     .from('tasks')
@@ -133,7 +111,7 @@ interface Task {
     .eq('user_id', userId);
   ```
 
-- **Create Task**:
+- **Create Task**: `POST /tasks`
   ```typescript
   const { data, error } = await supabase
     .from('tasks')
@@ -145,7 +123,7 @@ interface Task {
     });
   ```
 
-- **Update Task**:
+- **Update Task**: `PATCH /tasks/{taskId}`
   ```typescript
   const { data, error } = await supabase
     .from('tasks')
@@ -157,7 +135,7 @@ interface Task {
     .eq('id', taskId);
   ```
 
-- **Delete Task**:
+- **Delete Task**: `DELETE /tasks/{taskId}`
   ```typescript
   const { error } = await supabase
     .from('tasks')
