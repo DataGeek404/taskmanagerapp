@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase';
 
 export async function setupTasksTable() {
@@ -115,7 +114,6 @@ export async function setupTasksTable() {
   }
 }
 
-// We'll simplify our approach by using direct SQL
 export async function createCustomFunction() {
   try {
     // We no longer need to create a separate function, we'll execute SQL directly
@@ -126,7 +124,6 @@ export async function createCustomFunction() {
   }
 }
 
-// Simplified database initialization
 export async function initializeDatabase() {
   try {
     // Try to check if tasks table exists
@@ -153,7 +150,6 @@ export async function initializeDatabase() {
   }
 }
 
-// New function to execute SQL directly for creating the tables
 export async function executeDirectSQL() {
   try {
     // Use the SQL tag functionality in Supabase to execute SQL directly
@@ -164,13 +160,17 @@ export async function executeDirectSQL() {
       return false;
     }
     
+    // Get the Supabase URL and key from the same place we configure the client
+    const supabaseUrl = 'https://lzljzjmhtoyrthcfitjp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6bGp6am1odG95cnRoY2ZpdGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMzMjU3NjYsImV4cCI6MjA1ODkwMTc2Nn0.4coR_AKPhFz5CuEtj5817bVJ-CyYrC5XMcVDwPWRpt4';
+    
     // Create the tasks table directly with SQL
-    const response = await fetch(`${supabase.supabaseUrl}/rest/v1/`, {
+    const response = await fetch(`${supabaseUrl}/rest/v1/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${data.session.access_token}`,
-        'apikey': supabase.supabaseKey,
+        'apikey': supabaseKey,
         'Prefer': 'resolution=merge-duplicates'
       },
       body: JSON.stringify({
