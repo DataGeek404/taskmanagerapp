@@ -3,10 +3,11 @@ import React from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle, BarChart, ListFilter } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CircleUser, List, LogOut, Plus, LayoutDashboard, Clock, CheckCircle2, AlertCircle, BarChart, ListFilter, ArrowLeft } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { TaskStatus } from '@/lib/supabase';
 import { useTask } from '@/lib/task-context';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -16,6 +17,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { signOut, user } = useAuth();
   const { setFilter, filter } = useTask();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isMobile = useIsMobile();
 
   const handleLogout = async () => {
     await signOut();
@@ -24,7 +27,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const handleStatusChange = (status: TaskStatus | 'all') => {
     setFilter(status);
+    if (location.pathname === '/analytics' && isMobile) {
+      navigate('/dashboard');
+    }
   };
+
+  const isAnalyticsPage = location.pathname === '/analytics';
 
   return (
     <SidebarProvider>
@@ -34,6 +42,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           activeFilter={filter} 
           onLogout={handleLogout} 
           userEmail={user?.email || ''}
+          isAnalyticsPage={isAnalyticsPage}
         />
         <main className="flex-1 overflow-auto p-6 md:p-8">
           <div className="md:hidden flex items-center mb-6">
@@ -54,10 +63,29 @@ interface AppSidebarProps {
   activeFilter: TaskStatus | 'all';
   onLogout: () => void;
   userEmail: string;
+  isAnalyticsPage: boolean;
 }
 
-const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, onLogout, userEmail }) => {
+const AppSidebar: React.FC<AppSidebarProps> = ({ 
+  onStatusChange, 
+  activeFilter, 
+  onLogout, 
+  userEmail,
+  isAnalyticsPage 
+}) => {
   const navigate = useNavigate();
+  const { useSidebar } = require('@/components/ui/sidebar');
+  const { setOpenMobile } = useSidebar();
+
+  const handleFilterClick = (status: TaskStatus | 'all') => {
+    onStatusChange(status);
+    setOpenMobile(false); // Close mobile sidebar after clicking
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setOpenMobile(false); // Close mobile sidebar after clicking
+  };
 
   return (
     <Sidebar className="border-r border-border bg-gray-50 dark:bg-gray-900/50">
@@ -69,7 +97,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 mb-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            onClick={() => navigate('/new-task')}
+            onClick={() => handleNavigate('/new-task')}
           >
             <Plus className="h-5 w-5 text-primary" />
             <span>New Task</span>
@@ -85,7 +113,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
               <Button
                 variant={activeFilter === 'all' ? 'secondary' : 'ghost'}
                 className="w-full justify-start gap-3 group"
-                onClick={() => onStatusChange('all')}
+                onClick={() => handleFilterClick('all')}
               >
                 <LayoutDashboard className={`h-5 w-5 ${activeFilter === 'all' ? 'text-white' : 'text-gray-600 dark:text-gray-400 group-hover:text-primary'} transition-colors`} />
                 <span>All Tasks</span>
@@ -93,7 +121,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
               <Button
                 variant={activeFilter === 'pending' ? 'secondary' : 'ghost'}
                 className="w-full justify-start gap-3 group"
-                onClick={() => onStatusChange('pending')}
+                onClick={() => handleFilterClick('pending')}
               >
                 <AlertCircle className={`h-5 w-5 ${activeFilter === 'pending' ? 'text-white' : 'text-amber-500 group-hover:text-amber-600'} transition-colors`} />
                 <span>Pending</span>
@@ -101,7 +129,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
               <Button
                 variant={activeFilter === 'in-progress' ? 'secondary' : 'ghost'}
                 className="w-full justify-start gap-3 group"
-                onClick={() => onStatusChange('in-progress')}
+                onClick={() => handleFilterClick('in-progress')}
               >
                 <Clock className={`h-5 w-5 ${activeFilter === 'in-progress' ? 'text-white' : 'text-blue-500 group-hover:text-blue-600'} transition-colors`} />
                 <span>In Progress</span>
@@ -109,7 +137,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
               <Button
                 variant={activeFilter === 'completed' ? 'secondary' : 'ghost'}
                 className="w-full justify-start gap-3 group"
-                onClick={() => onStatusChange('completed')}
+                onClick={() => handleFilterClick('completed')}
               >
                 <CheckCircle2 className={`h-5 w-5 ${activeFilter === 'completed' ? 'text-white' : 'text-green-500 group-hover:text-green-600'} transition-colors`} />
                 <span>Completed</span>
@@ -119,11 +147,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ onStatusChange, activeFilter, o
           
           {/* Analytics Button */}
           <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 mt-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            onClick={() => navigate('/analytics')}
+            variant={isAnalyticsPage ? 'secondary' : 'ghost'}
+            className="w-full justify-start gap-3 mt-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+            onClick={() => handleNavigate('/analytics')}
           >
-            <BarChart className="h-5 w-5 text-purple-500 group-hover:text-purple-600" />
+            <BarChart className={`h-5 w-5 ${isAnalyticsPage ? 'text-white' : 'text-purple-500 group-hover:text-purple-600'} transition-colors`} />
             <span>Analytics</span>
           </Button>
         </div>
