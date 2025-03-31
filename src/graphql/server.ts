@@ -1,4 +1,5 @@
 
+
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -39,27 +40,24 @@ async function startServer() {
     customSiteTitle: 'James Task Manager API Documentation',
   }));
 
-  // Apply middleware
-  app.use(
-    '/graphql',
-    cors<cors.CorsRequest>(),
-    bodyParser.json(),
-    expressMiddleware(server, {
-      context: async ({ req }) => {
-        // Extract the token from the Authorization header
-        const token = req.headers.authorization?.replace('Bearer ', '') || '';
-        
-        if (!token) return { userId: null };
-        
-        // Verify the token with Supabase
-        const { data, error } = await supabase.auth.getUser(token);
-        
-        if (error || !data.user) return { userId: null };
-        
-        return { userId: data.user.id };
-      },
-    }),
-  );
+  // Apply middleware - fixing the type error by using individual middleware calls
+  app.use('/graphql', cors<cors.CorsRequest>());
+  app.use('/graphql', bodyParser.json());
+  app.use('/graphql', expressMiddleware(server, {
+    context: async ({ req }) => {
+      // Extract the token from the Authorization header
+      const token = req.headers.authorization?.replace('Bearer ', '') || '';
+      
+      if (!token) return { userId: null };
+      
+      // Verify the token with Supabase
+      const { data, error } = await supabase.auth.getUser(token);
+      
+      if (error || !data.user) return { userId: null };
+      
+      return { userId: data.user.id };
+    },
+  }));
 
   // Add health check endpoint
   app.get('/health', (req, res) => {

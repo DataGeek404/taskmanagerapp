@@ -1,7 +1,7 @@
-import { OpenAPIObject } from 'openapi3-ts';
+import { OpenAPI } from 'openapi3-ts';
 
 // Define the OpenAPI specification
-export const swaggerDocument: OpenAPIObject = {
+export const swaggerDocument: OpenAPI.Document = {
   openapi: '3.0.0',
   info: {
     title: 'James Task Manager API',
