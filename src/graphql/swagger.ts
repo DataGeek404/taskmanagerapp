@@ -207,6 +207,7 @@ export const getGraphQLOperationsDoc = () => {
                       },
                     },
                   },
+                  
                   updateTask: {
                     summary: 'Update an existing task',
                     value: {
