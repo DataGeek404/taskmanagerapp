@@ -1,5 +1,5 @@
 
-import { OpenAPIObject } from 'openapi3-ts';
+import { OpenAPIObject } from 'openapi3-ts/dist/model/openapi31';
 
 // Define the OpenAPI specification
 export const swaggerDocument: OpenAPIObject = {
