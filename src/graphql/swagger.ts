@@ -1,4 +1,4 @@
-//importing openAPIV3
+//import OpenAPIV3
 import { OpenAPIV3 } from 'openapi3-ts';
 
 // Define the OpenAPI specification
@@ -207,7 +207,7 @@ export const getGraphQLOperationsDoc = () => {
                       },
                     },
                   },
-                  
+
                   updateTask: {
                     summary: 'Update an existing task',
                     value: {
