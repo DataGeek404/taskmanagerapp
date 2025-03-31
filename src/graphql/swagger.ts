@@ -1,5 +1,5 @@
 
-import { OpenAPIV3 } from 'openapi3-ts/dist/oas31';
+import { OpenAPIV3 } from 'openapi3-ts';
 
 // Define the OpenAPI specification
 export const swaggerDocument: OpenAPIV3.Document = {
