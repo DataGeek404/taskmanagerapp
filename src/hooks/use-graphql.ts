@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { executeGraphQL } from '../graphql/client';
 import { useAuth } from '../lib/auth-context';
 
+// exporting the function
+
 export function useGraphQL() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

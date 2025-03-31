@@ -11,6 +11,8 @@ import TaskAnalytics from '@/pages/TaskAnalytics';
 import GuestRoute from '@/components/auth/GuestRoute';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
+//defining app routes
+
 const AppRoutes = () => {
   return (
     <Routes>

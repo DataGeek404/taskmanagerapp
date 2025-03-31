@@ -15,6 +15,7 @@ export async function initializeDatabase() {
     
     if (error && error.code === '42P01') {
       // Table doesn't exist, which is what we expect initially
+      // Table doesn't exist, which is what we expect initially
       console.log('Tasks table does not exist yet, ready to create it');
       return true;
     } else if (error) {

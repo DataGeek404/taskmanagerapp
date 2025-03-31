@@ -7,6 +7,7 @@ import {
   setupTasksTable 
 } from './database';
 import { useToast } from '@/hooks/use-toast';
+//db initializer
 
 /**
  * Initializes the database for tasks

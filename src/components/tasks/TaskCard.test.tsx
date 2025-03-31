@@ -12,7 +12,7 @@ vi.mock('@/lib/task-context', () => ({
     updateTask: vi.fn(),
   }),
 }));
-
+// Mock the task context
 describe('TaskCard', () => {
   const mockTask = {
     id: '1',

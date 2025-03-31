@@ -1,6 +1,6 @@
 
 // This is a standalone script to start the GraphQL server
-// Run with: node scripts/start-graphql-server.js
+// Run with:node scripts/start-graphql-server.js
 
 require('esbuild').buildSync({
   entryPoints: ['src/graphql/server.ts'],

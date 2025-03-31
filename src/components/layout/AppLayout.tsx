@@ -20,6 +20,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
+  //handling logout
+  
   const handleLogout = async () => {
     await signOut();
     navigate('/login');

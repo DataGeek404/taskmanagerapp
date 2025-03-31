@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [tableExists, setTableExists] = useState<boolean | null>(null);
   
   // Check if the tasks table exists
+  // Check if the tasks table exists
   useEffect(() => {
     const checkTable = async () => {
       try {
