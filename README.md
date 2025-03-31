@@ -1,8 +1,6 @@
 # James Task Manager
 
-A personal task management application built with React, TypeScript, and Supabase.
-
-![James Task Manager](https://i.imgur.com/8db90c00.png)
+A personal task management application built with Next.js Express.js, React, TypeScript, and Supabase.
 
 ## Project Overview
 
