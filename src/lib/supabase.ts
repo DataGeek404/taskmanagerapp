@@ -1,4 +1,4 @@
-
+//Supabase client configuration
 /**
  * Supabase client configuration and database types for the application.
  * This module initializes the Supabase client and defines types for database entities.

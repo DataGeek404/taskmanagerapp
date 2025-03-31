@@ -1,3 +1,4 @@
+//Nalytics e.g in summary charts
 
 import React from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';

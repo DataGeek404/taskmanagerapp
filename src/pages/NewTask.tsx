@@ -4,7 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { useTask } from '@/lib/task-context';
 
 const NewTask = () => {
-  // Try to access the task context to verify it's available
+  // Try to access the task context to verify it's available or not
   // This is just to ensure the component is properly wrapped in TaskProvider
   useTask();
   

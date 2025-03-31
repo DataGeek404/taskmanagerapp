@@ -1,3 +1,4 @@
+//setting up mobile breakpoint
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768

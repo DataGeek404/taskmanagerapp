@@ -1,3 +1,4 @@
+//user registration
 
 import { AuthForm } from '@/components/auth/AuthForm';
 

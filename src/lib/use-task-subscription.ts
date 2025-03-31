@@ -1,3 +1,4 @@
+//using real-time subscription to task changes
 
 import { useEffect } from 'react';
 import { supabase } from './supabase';

@@ -1,4 +1,5 @@
 
+
 /**
  * Authentication form component for login and registration.
  * Handles form validation and submission for authentication operations.

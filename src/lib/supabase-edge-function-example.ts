@@ -10,7 +10,7 @@
 // In the actual Supabase dashboard, you would create a file like this:
 
 /*
-// Example Supabase Edge Function:
+// Example Supabase Edge Function://
 // File: functions/example-function/index.ts
 
 // Import Deno's standard library HTTP server (in the Supabase Edge runtime)
@@ -64,5 +64,4 @@ serve(async (req) => {
 })
 */
 
-// Note: This file is just an example and doesn't actually run in the browser.
-// To use Edge Functions, you need to create them in the Supabase dashboard.
+

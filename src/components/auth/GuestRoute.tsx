@@ -1,4 +1,5 @@
 
+
 /**
  * GuestRoute component for protecting routes that should only be accessible to guests.
  * Redirects authenticated users to the dashboard.

@@ -7,7 +7,7 @@ import { supabase } from '../supabase';
  */
 export async function createCustomFunction() {
   try {
-    // We no longer need to create a separate function, we'll execute SQL directly
+    // We no longer need to create a separate function, we'll execute SQL directly//
     return true;
   } catch (error: any) {
     console.error('Error creating custom function:', error);

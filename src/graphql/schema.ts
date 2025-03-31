@@ -1,7 +1,7 @@
 
 import { gql } from 'graphql-tag';
 
-// Define GraphQL schema using SDL (Schema Definition Language)
+// Define and setting up GraphQL schema using SDL (Schema Definition Language)
 export const typeDefs = gql`
   type Task {
     id: ID!

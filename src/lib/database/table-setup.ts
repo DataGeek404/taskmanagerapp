@@ -7,7 +7,7 @@ import { supabase } from '../supabase';
  */
 export async function setupTasksTable() {
   try {
-    // Create tasks table with direct SQL instead of RPC
+    // Create tasks table with direct SQL instead of RPC//
     const { error } = await supabase.rpc('exec_sql', {
       sql_query: `
         CREATE TABLE IF NOT EXISTS public.tasks (

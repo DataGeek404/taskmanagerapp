@@ -23,7 +23,7 @@ export async function initializeDatabase() {
       return false;
     }
     
-    // Table already exists
+    // Table already exists.
     console.log('Tasks table already exists');
     return true;
   } catch (error: any) {

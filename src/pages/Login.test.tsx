@@ -19,7 +19,7 @@ describe('Login Page', () => {
       </BrowserRouter>
     );
     
-    // Check for the title
+    // Check for the title content
     expect(screen.getByText('James Task Manager')).toBeInTheDocument();
     
     // Check for the subtitle

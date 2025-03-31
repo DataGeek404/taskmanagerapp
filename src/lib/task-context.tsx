@@ -69,7 +69,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, toast]);
 
-  // Initial fetch
+  // Initialize fetch//
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks, dbInitialized]);

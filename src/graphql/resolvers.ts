@@ -1,3 +1,4 @@
+//setting up resolvers
 
 import { supabase } from '../lib/supabase';
 import type { Task } from '../lib/supabase';

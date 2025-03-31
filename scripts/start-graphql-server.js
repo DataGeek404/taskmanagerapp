@@ -10,5 +10,6 @@ require('esbuild').buildSync({
   external: ['pg-native'], // Some dependencies might require native modules
 });
 
+
 console.log('GraphQL server bundle created, starting server...');
 require('../dist/graphql-server.js');
