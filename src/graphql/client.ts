@@ -7,6 +7,7 @@ export async function executeGraphQL(
   token?: string
 ) {
   // Default to local development endpoint, can be overridden with env var
+  // Default to local development endpoint, can be overridden with env var
   const endpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql';
   
   const headers: HeadersInit = {
