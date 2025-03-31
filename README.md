@@ -19,9 +19,9 @@ James Task Manager is a responsive web application that helps users manage their
 
 ## Technology Stack
 
-- **Frontend**: React, TypeScript, Vite
+- **Frontend**: React, TypeScript, Vite, Next.js
 - **UI Components**: shadcn-ui, Tailwind CSS
-- **State Management**: React Context API, React Query
+- **State Management**: GraphQL API, React Query
 - **Backend & Database**:Express.js Supabase (Authentication, PostgreSQL)
 - **Routing**: React Router
 
