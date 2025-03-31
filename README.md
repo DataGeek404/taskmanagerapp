@@ -1,3 +1,4 @@
+
 # James Task Manager
 
 A personal task management application built with Next.js Express.js, React, TypeScript, and Supabase.
@@ -22,6 +23,7 @@ James Task Manager is a responsive web application that helps users manage their
 - **State Management**: GraphQL API, React Query
 - **Backend & Database**:Express.js Supabase (Authentication, PostgreSQL)
 - **Routing**: React Router
+- **API Documentation**: Swagger UI
 
 ## Project Setup
 
@@ -50,25 +52,23 @@ npm run dev
 
 This will start the application on http://localhost:5173 (or another port if 5173 is in use).
 
-## Project Structure
+### Starting the GraphQL Server
 
+Run the GraphQL server separately using:
+
+```sh
+node scripts/start-graphql-server.js
 ```
-src/
-├── components/       # UI components
-│   ├── auth/         # Authentication components
-│   ├── layout/       # Layout components
-│   ├── routes/       # Routing components
-│   ├── tasks/        # Task-related components
-│   └── ui/           # UI components from shadcn
-├── hooks/            # Custom React hooks
-├── lib/              # Utility libraries and contexts
-├── pages/            # Page components
-└── main.tsx          # Application entry point
-```
+
+The GraphQL server will be available at http://localhost:4000/graphql
 
 ## API Documentation
 
-### Authentication API Endpoints
+API documentation is available via Swagger UI at http://localhost:4000/api-docs when the GraphQL server is running.
+
+### GraphQL API Examples
+
+#### Authentication API Endpoints
 
 - **Sign Up**: `POST /auth/signup`
   ```typescript
