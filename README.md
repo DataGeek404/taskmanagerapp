@@ -14,7 +14,7 @@ James Task Manager is a responsive web application that helps users manage their
 
 ## Live Deployment
 
-**Live URL**: https://taskoriq.vercel.app/
+**Live URL**: https://taskmanagerapp-iota.vercel.app/
 
 ## Technology Stack
 
